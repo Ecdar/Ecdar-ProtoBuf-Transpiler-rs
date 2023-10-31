@@ -1,0 +1,7 @@
+[workspace]
+resolver = "2"
+members = [
+    "ecdar-protobuf-transpiler",
+    "ecdar-protobuf-transpiler-macros",
+]
+
