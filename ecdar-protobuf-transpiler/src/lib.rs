@@ -12,3 +12,12 @@ pub struct Endpoint{
 }
 
 pub use ecdar_protobuf_transpiler_macros::*;
+
+#[cfg(test)]
+mod test {
+    #[test]
+    pub fn test() {
+        let service = ecdar_protobuf_transpiler_macros::get_services!();
+    }
+}
+
