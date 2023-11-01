@@ -1,7 +1,14 @@
 use std::fs;
 use std::path::Path;
 
-const TYPES : &'static str = 
+fn map_types<'a>(input : &'a str) -> &'a str{ 
+    match input {
+        "google.protobuf.Empty" => "()",
+        _ => input
+    }
+}
+
+const STRUCTS : &'static str = 
 r#"
 #[derive(Debug)]
 pub struct Service{
@@ -19,12 +26,11 @@ pub struct Endpoint{
 
 fn main() {
     let out_dir = std::env::var("OUT_DIR").unwrap();
-    let protobuff_dir: String = "./Ecdar-ProtoBuf/".into();
-    let root_file = format!("{protobuff_dir}services.proto");
+    let root_file = "./Ecdar-ProtoBuf/services.proto";
 
     fs::write(
         format!("{out_dir}/services.rs"),
-        format!("{TYPES}pub const SERVICES: &'static[Service]= &[{}];", find_service(Path::new("./Ecdar-ProtoBuf/services.proto"))),
+        format!("{STRUCTS}pub const SERVICES: &'static[Service]= &[{}];", find_service(Path::new(root_file))),
     )
     .unwrap();
 
@@ -208,12 +214,12 @@ fn find_service(path: &Path) -> String {
                     rtn = rtn + "Endpoint{name:" + "\"" + endpoint + "\"" + ",";
                     expect!("(", next!());
                     let input_type = next!();
-                    rtn = rtn + "input_type:\"" + input_type + "\"" + ",";
+                    rtn = rtn + "input_type:\"" + map_types(input_type) + "\"" + ",";
                     expect!(")", next!());
                     expect!("returns", next!());
                     expect!("(", next!());
                     let output_type = next!();
-                    rtn = rtn + "output_type:\"" + output_type + "\"" + "},";
+                    rtn = rtn + "output_type:\"" + map_types(output_type) + "\"" + "},";
                     expect!(")", next!());
                     expect!(";", next!());
                 }
