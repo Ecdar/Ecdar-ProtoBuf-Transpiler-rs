@@ -1,7 +1,21 @@
 use std::fs;
 use std::path::Path;
 
-const LIB :&'static str = "ecdar_protbuf_transpiler";
+const TYPES : &'static str = 
+r#"
+#[derive(Debug)]
+pub struct Service{
+    pub name: &'static str,
+    pub endpoints : &'static [Endpoint]
+}
+
+#[derive(Debug)]
+pub struct Endpoint{
+    pub name: &'static str,
+    pub input_type: &'static str,
+    pub output_type: &'static str,
+}
+"#;
 
 fn main() {
     let out_dir = std::env::var("OUT_DIR").unwrap();
@@ -9,8 +23,8 @@ fn main() {
     let root_file = format!("{protobuff_dir}services.proto");
 
     fs::write(
-        format!("{out_dir}/services.txt"),
-        format!("vec![{}]", find_service(Path::new("./Ecdar-ProtoBuf/services.proto"))),
+        format!("{out_dir}/services.rs"),
+        format!("{TYPES}pub const SERVICES: &'static[Service]= &[{}];", find_service(Path::new("./Ecdar-ProtoBuf/services.proto"))),
     )
     .unwrap();
 
@@ -184,14 +198,14 @@ fn find_service(path: &Path) -> String {
             },
             "service" => {
                 let name = next!();
-                rtn = rtn + LIB + "::Service{name:\"" + name + "\",endpoints:vec![" ;
+                rtn = rtn + "Service{name:\"" + name + "\",endpoints:&[" ;
                 expect!("{", next!());
                 loop {
                     let token = next!();
                     if token == "}" { break }
                     expect!("rpc", token);
                     let endpoint = next!();
-                    rtn = rtn + LIB + "::Endpoint{name:" + "\"" + endpoint + "\"" + ",";
+                    rtn = rtn + "Endpoint{name:" + "\"" + endpoint + "\"" + ",";
                     expect!("(", next!());
                     let input_type = next!();
                     rtn = rtn + "input_type:\"" + input_type + "\"" + ",";
