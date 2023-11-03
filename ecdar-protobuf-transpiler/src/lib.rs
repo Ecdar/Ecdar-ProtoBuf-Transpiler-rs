@@ -50,7 +50,7 @@ pub fn compile(foreach: impl Fn(CompileVariables) -> String) -> String {
                         endpoint_name: endpoint.name.into(),
                         service_name: service.name.into(),
                         in_struct: format!(
-                            "struct In{}{{ ip : String, {}}}",
+                            "struct {}{{ ip : String, {}}}",
                             in_struct_name,
                             if in_struct_has_body {
                                 format!("body : {}", endpoint.input_type.to_rust_type())
