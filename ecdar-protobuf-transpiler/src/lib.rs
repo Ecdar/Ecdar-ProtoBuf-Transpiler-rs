@@ -42,7 +42,7 @@ pub fn compile(foreach: impl Fn(CompileVariables) -> String) -> String {
                 .iter()
                 .map(|endpoint| {
                     let fn_name = get_fn_name(service.name, endpoint.name).to_case(Case::Snake);
-                    let in_struct_has_body = endpoint.input_type.to_rust_type() == "()";
+                    let in_struct_has_body = endpoint.input_type.to_rust_type() != "()";
                     let in_struct_name = fn_name.to_case(Case::Pascal);
                     let rtn_struct = endpoint.output_type.to_rust_type();
 
@@ -50,7 +50,7 @@ pub fn compile(foreach: impl Fn(CompileVariables) -> String) -> String {
                         endpoint_name: endpoint.name.into(),
                         service_name: service.name.into(),
                         in_struct: format!(
-                            "In{}{{ ip : String, {}}}",
+                            "struct In{}{{ ip : String, {}}}",
                             in_struct_name,
                             if in_struct_has_body {
                                 format!("body : {}", endpoint.input_type.to_rust_type())
