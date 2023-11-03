@@ -19,9 +19,15 @@ pub struct Service{
 #[derive(Debug)]
 pub struct Endpoint{
     pub name: &'static str,
-    pub input_type: &'static str,
-    pub output_type: &'static str,
+    pub input_type: ProtobuffTypes,
+    pub output_type: ProtobuffTypes,
 }
+
+#[derive(Debug)]
+pub struct ProtobuffTypes {
+    pub name : &'static str
+}
+
 "#;
 
 fn main() {
@@ -214,12 +220,12 @@ fn find_service(path: &Path) -> String {
                     rtn = rtn + "Endpoint{name:" + "\"" + endpoint + "\"" + ",";
                     expect!("(", next!());
                     let input_type = next!();
-                    rtn = rtn + "input_type:\"" + map_types(input_type) + "\"" + ",";
+                    rtn = rtn + "input_type:ProtobuffTypes{name:\"" + input_type + "\"}" + ",";
                     expect!(")", next!());
                     expect!("returns", next!());
                     expect!("(", next!());
                     let output_type = next!();
-                    rtn = rtn + "output_type:\"" + map_types(output_type) + "\"" + "},";
+                    rtn = rtn + "output_type:ProtobuffTypes{name:\"" + output_type + "\"}" + "},";
                     expect!(")", next!());
                     expect!(";", next!());
                 }

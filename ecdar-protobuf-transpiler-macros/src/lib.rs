@@ -1,6 +1,6 @@
 use std::fs;
 
-use proc_macro::{TokenStream};
+use proc_macro::TokenStream;
 
 
 #[proc_macro]
