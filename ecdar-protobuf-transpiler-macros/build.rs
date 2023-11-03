@@ -1,15 +1,14 @@
 use std::fs;
 use std::path::Path;
 
-fn map_types<'a>(input : &'a str) -> &'a str{ 
+fn map_types<'a>(input: &'a str) -> &'a str {
     match input {
         "google.protobuf.Empty" => "()",
-        _ => input
+        _ => input,
     }
 }
 
-const STRUCTS : &'static str = 
-r#"
+const STRUCTS: &'static str = r#"
 #[derive(Debug)]
 pub struct Service{
     pub name: &'static str,
@@ -36,7 +35,10 @@ fn main() {
 
     fs::write(
         format!("{out_dir}/services.rs"),
-        format!("{STRUCTS}pub const SERVICES: &'static[Service]= &[{}];", find_service(Path::new(root_file))),
+        format!(
+            "{STRUCTS}pub const SERVICES: &'static[Service]= &[{}];",
+            find_service(Path::new(root_file))
+        ),
     )
     .unwrap();
 
@@ -172,7 +174,7 @@ fn find_service(path: &Path) -> String {
                     Some(token) => {
                         println!("{token}");
                         token
-                    },
+                    }
                     None => {
                         break 'outer;
                     }
@@ -183,9 +185,12 @@ fn find_service(path: &Path) -> String {
         macro_rules! expect {
             ($e:expr, $g:expr) => {{
                 let token = $g;
-                if $e != token{
-                    panic!("Wront syntax in .protofile: {path:?} expected {} got {}", $e, token) 
-                } 
+                if $e != token {
+                    panic!(
+                        "Wront syntax in .protofile: {path:?} expected {} got {}",
+                        $e, token
+                    )
+                }
             }};
         }
 
@@ -207,14 +212,16 @@ fn find_service(path: &Path) -> String {
                     folder += path_iter.next().expect("no .proto file in import");
                 }
                 rtn += find_service(Path::new(format!("{root}/{folder}").as_str())).as_str();
-            },
+            }
             "service" => {
                 let name = next!();
-                rtn = rtn + "Service{name:\"" + name + "\",endpoints:&[" ;
+                rtn = rtn + "Service{name:\"" + name + "\",endpoints:&[";
                 expect!("{", next!());
                 loop {
                     let token = next!();
-                    if token == "}" { break }
+                    if token == "}" {
+                        break;
+                    }
                     expect!("rpc", token);
                     let endpoint = next!();
                     rtn = rtn + "Endpoint{name:" + "\"" + endpoint + "\"" + ",";
@@ -230,7 +237,7 @@ fn find_service(path: &Path) -> String {
                     expect!(";", next!());
                 }
                 rtn += "]},";
-            },
+            }
             _ => {
                 // Ignore entire statement
                 let mut indent = 0;
