@@ -15,7 +15,7 @@ impl services::ProtobuffTypes {
             "google.protobuf.Empty" => "()".into(),
             _ => {
                 panic!(
-                    "{} is not maped, please map it in crate ecdar-protobuf-transpiler",
+                    "{} is not maped, please map it in crate ecdar-protobuf-transpiler in file lib.rs",
                     self.name
                 )
             }
