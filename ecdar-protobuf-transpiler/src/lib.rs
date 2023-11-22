@@ -7,14 +7,16 @@ mod services {
 }
 
 impl services::ProtobuffTypes {
-    pub fn to_rust_type(&self) -> String {
+    pub fn to_rust_type(&self) -> TokenStream {
         let is_google = self.name.split('.').next().unwrap() == "google";
         match self.name {
-            _ if !is_google => format!(
-                "ecdar_protobuf::services::{}",
-                self.name.to_case(Case::Pascal)
-            ),
-            "google.protobuf.Empty" => "()".into(),
+            _ if !is_google => {
+                let ident = format_ident!("{}", self.name.to_case(Case::Pascal));
+                quote!(
+                    ecdar_protobuf::services::#ident,
+                )
+            },
+            "google.protobuf.Empty" => quote!(()),
             _ => {
                 panic!(
                     "{} is not maped, please map it in crate ecdar-protobuf-transpiler in file lib.rs",
@@ -49,17 +51,16 @@ pub fn compile<T>(foreach: impl Fn(CompileVariables) -> T) -> Vec<T> {
                         service.name.to_case(Case::Pascal) + 
                         endpoint.name.to_case(Case::Pascal).as_str()
                     );
-                    let body_rust_type_str = endpoint.input_type.to_rust_type();
-                    let in_struct_has_body = body_rust_type_str != "()";
+                    let body_rust_type = endpoint.input_type.to_rust_type();
+                    let in_struct_has_body = body_rust_type.to_string() != "()".to_string();
 
                     let body = if in_struct_has_body {
-                        let body_rust_type = format_ident!("{}", body_rust_type_str);
                         quote!{ pub body : #body_rust_type}
                     } else {
                         quote!{}
                     };
 
-                    let rtn_struct = format_ident!("{}", endpoint.output_type.to_rust_type());
+                    let rtn_struct = endpoint.output_type.to_rust_type();
 
                     let client = format_ident!(
                         "services::{}_client::{}Client",
@@ -67,8 +68,8 @@ pub fn compile<T>(foreach: impl Fn(CompileVariables) -> T) -> Vec<T> {
                         service.name.to_case(Case::Pascal)
                     );
 
-                    let endpoint_name = format_ident!("{}", endpoint.name);
-                    let service_name = format_ident!("{}", service.name);
+                    let endpoint_name = format_ident!("{}", endpoint.name.to_case(Case::Snake));
+                    let service_name = format_ident!("{}", service.name.to_case(Case::Snake));
 
                     foreach(CompileVariables {
                         endpoint_name : quote!(#endpoint_name),
@@ -83,7 +84,7 @@ pub fn compile<T>(foreach: impl Fn(CompileVariables) -> T) -> Vec<T> {
                         },
                         in_struct_name : quote!(#in_struct_name),
                         client : quote!(#client),
-                        rtn_struct : quote!(#rtn_struct),
+                        rtn_struct,
                         in_struct_has_body
                     })
                 })
