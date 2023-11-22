@@ -62,11 +62,9 @@ pub fn compile<T>(foreach: impl Fn(CompileVariables) -> T) -> Vec<T> {
 
                     let rtn_struct = endpoint.output_type.to_rust_type();
 
-                    let client = format_ident!(
-                        "services::{}_client::{}Client",
-                        service.name.to_case(Case::Snake),
-                        service.name.to_case(Case::Pascal)
-                    );
+                    let client_module = format_ident!("{}_client", service.name.to_case(Case::Snake));
+                    let client_struct = format_ident!("{}Client", service.name.to_case(Case::Pascal));
+
 
                     let endpoint_name = format_ident!("{}", endpoint.name.to_case(Case::Snake));
                     let service_name = format_ident!("{}", service.name.to_case(Case::Snake));
@@ -83,7 +81,7 @@ pub fn compile<T>(foreach: impl Fn(CompileVariables) -> T) -> Vec<T> {
                             } 
                         },
                         in_struct_name : quote!(#in_struct_name),
-                        client : quote!(#client),
+                        client : quote!(services::#client_module::#client_struct),
                         rtn_struct,
                         in_struct_has_body
                     })
