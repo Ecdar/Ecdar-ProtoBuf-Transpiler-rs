@@ -47,9 +47,9 @@ pub fn compile<T>(foreach: impl Fn(CompileVariables) -> T) -> Vec<T> {
                 .iter()
                 .map(|endpoint| {
                     let fn_name = format_ident!("{}", get_fn_name(service.name, endpoint.name));
-                    let in_struct_name = format_ident!("In{}",
-                        service.name.to_case(Case::Pascal) + 
-                        endpoint.name.to_case(Case::Pascal).as_str()
+                    let in_struct_name = format_ident!("In{}{}",
+                        service.name.to_case(Case::Pascal), 
+                        endpoint.name.to_case(Case::Pascal)
                     );
                     let body_rust_type = endpoint.input_type.to_rust_type();
                     let in_struct_has_body = body_rust_type.to_string() != "()".to_string();
@@ -81,7 +81,7 @@ pub fn compile<T>(foreach: impl Fn(CompileVariables) -> T) -> Vec<T> {
                             } 
                         },
                         in_struct_name : quote!(#in_struct_name),
-                        client : quote!(services::#client_module::#client_struct),
+                        client : quote!(ecdar_protobuf::services::#client_module::#client_struct),
                         rtn_struct,
                         in_struct_has_body
                     })
