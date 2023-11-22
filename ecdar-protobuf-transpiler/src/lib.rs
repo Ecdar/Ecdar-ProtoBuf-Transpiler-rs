@@ -33,7 +33,7 @@ pub struct CompileVariables {
     pub rtn_struct: String,
 }
 
-pub fn compile(foreach: impl Fn(CompileVariables) -> String) -> String {
+pub fn compile<T>(foreach: impl Fn(CompileVariables) -> T) -> Vec<T> {
     services::SERVICES
         .iter()
         .map(|service| {
@@ -65,10 +65,10 @@ pub fn compile(foreach: impl Fn(CompileVariables) -> String) -> String {
                     })
                 })
                 .collect::<Vec<_>>()
-                .join("\n")
-        })
-        .collect::<Vec<_>>()
-        .join("\n")
+        }).reduce(|mut acc, mut v| {
+            acc.append(&mut v);
+            acc
+        }).unwrap()
 }
 
 fn get_fn_name(service_name: &str, enpoint_name: &str) -> String {
