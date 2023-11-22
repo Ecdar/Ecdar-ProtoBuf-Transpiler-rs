@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 convert_case = "0.6.0"
 ecdar-protobuf-transpiler-macros = { version = "0.1.0", path = "../ecdar-protobuf-transpiler-macros" }
+proc-macro2 = "1.0.69"
+quote = "1.0.33"
