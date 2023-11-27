@@ -13,7 +13,7 @@ impl services::ProtobuffTypes {
             _ if !is_google => {
                 let ident = format_ident!("{}", self.name.to_case(Case::Pascal));
                 quote!(
-                    ecdar_protobuf::services::#ident,
+                    ecdar_protobuf::services::#ident
                 )
             },
             "google.protobuf.Empty" => quote!(()),
