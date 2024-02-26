@@ -1,14 +1,7 @@
 use std::fs;
 use std::path::Path;
 
-fn map_types<'a>(input: &'a str) -> &'a str {
-    match input {
-        "google.protobuf.Empty" => "()",
-        _ => input,
-    }
-}
-
-const STRUCTS: &'static str = r#"
+const STRUCTS: &str = r#"
 #[derive(Debug)]
 pub struct Service{
     pub name: &'static str,
@@ -58,7 +51,7 @@ impl<'a> Iterator for Serializer<'a> {
         let mut end = 0;
         let mut chars = self.file.chars();
 
-        if self.file == "" {
+        if self.file.is_empty() {
             return None;
         }
 
@@ -140,8 +133,7 @@ impl<'a> Iterator for Serializer<'a> {
             }};
         }
 
-        loop {
-            let c = if let Some(c) = chars.next() { c } else { break };
+        while let Some(c) = chars.next() {
             match c {
                 _ if c.is_whitespace() => handle_whitespace!(),
                 '/' => handle_comment!(),
@@ -153,7 +145,7 @@ impl<'a> Iterator for Serializer<'a> {
 
         let rtn = &self.file[start..end];
         self.file = &self.file[end..];
-        if rtn == "" {
+        if rtn.is_empty() {
             return None;
         }
 
