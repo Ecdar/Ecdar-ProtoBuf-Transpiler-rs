@@ -1,4 +1,4 @@
 [submodule "ecdar-protobuf-transpiler-macros/Ecdar-ProtoBuf"]
 	path = ecdar-protobuf-transpiler-macros/Ecdar-ProtoBuf
-	url = git@github.com:Ecdar/Ecdar-ProtoBuf.git
+	url = https://github.com/Ecdar/Ecdar-ProtoBuf
 	branch = SW5
